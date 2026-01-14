@@ -2,6 +2,8 @@
 
 A LangGraph-based agent with real-time streaming UI for task processing.
 
+![BMO Chat Demo](assets/bmo-demo.gif)
+
 ## Features
 
 - **Three Tools**: Text processing, calculator, and weather lookup
