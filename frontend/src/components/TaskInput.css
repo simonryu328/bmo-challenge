@@ -1,0 +1,65 @@
+.task-input {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.task-input__field {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.task-input__field:focus {
+  border-color: var(--color-primary);
+}
+
+.task-input__field:disabled {
+  background-color: var(--color-bg);
+  cursor: not-allowed;
+}
+
+.task-input__button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  transition: background-color 0.2s;
+}
+
+.task-input__button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.task-input__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.task-input__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

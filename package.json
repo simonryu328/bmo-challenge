@@ -1,0 +1,20 @@
+{
+  "name": "bmo-chat",
+  "version": "0.1.0",
+  "description": "LangGraph agent with streaming UI for task processing",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd frontend && npm install && cd ../backend && python3 -m venv venv && . venv/bin/activate && pip install -e .",
+    "start:backend": "cd backend && . venv/bin/activate && python main.py",
+    "start:frontend": "cd frontend && npm run dev",
+    "start": "concurrently --names \"backend,frontend\" --prefix-colors \"yellow,cyan\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && . venv/bin/activate && pytest tests/ -v"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
