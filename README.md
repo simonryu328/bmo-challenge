@@ -88,5 +88,21 @@ python main.py     # Start server
 pytest tests/ -v   # Run tests
 ```
 
+## Docker
+
+```bash
+# Build backend image
+cd backend
+docker build -t bmo-backend .
+
+# Run container
+docker run -p 8000:8000 -e OPENAI_API_KEY=your-key-here bmo-backend
+```
+
 ## Thoughts
-The project took about 2 hrs to complete. With more time, I would migrate to PostgreSQL, implement authentication and multi-tenancy.
+
+The project took about 4 hours to complete. With an additional week, I would focus on two key improvements:
+
+1. **RBAC with user authentication** - Add JWT-based auth with role-based access control. Users would have scoped permissions (e.g., read-only, prompt-writer, admin), and task history would be isolated per user rather than shared globally.
+
+2. **Weather API response caching** - Replace the mock weather tool with a real API and implement Redis-based caching with TTL. Weather data doesn't change frequently, so caching responses for 10-15 minutes would reduce API costs and latency for repeated queries.
