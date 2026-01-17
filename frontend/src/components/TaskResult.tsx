@@ -1,13 +1,19 @@
 import ExecutionSteps from './ExecutionSteps';
+import type { Task } from '../types';
 import './TaskResult.css';
 
-const TOOL_COLORS = {
+const TOOL_COLORS: Record<string, string> = {
   TextProcessorTool: '#8b5cf6',
   CalculatorTool: '#f59e0b',
   WeatherMockTool: '#06b6d4',
 };
 
-export default function TaskResult({ task, isStreaming }) {
+interface TaskResultProps {
+  task: Task | null;
+  isStreaming: boolean;
+}
+
+export default function TaskResult({ task, isStreaming }: TaskResultProps) {
   if (!task) {
     return (
       <div className="task-result task-result--empty">
@@ -64,11 +70,11 @@ export default function TaskResult({ task, isStreaming }) {
   );
 }
 
-function formatToolName(tool) {
+function formatToolName(tool: string): string {
   return tool.replace('Tool', '').replace(/([A-Z])/g, ' $1').trim();
 }
 
-function formatDate(timestamp) {
+function formatDate(timestamp: string): string {
   try {
     const date = new Date(timestamp);
     return date.toLocaleString();

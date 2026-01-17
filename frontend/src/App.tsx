@@ -3,10 +3,11 @@ import TaskInput from './components/TaskInput';
 import TaskResult from './components/TaskResult';
 import TaskHistory from './components/TaskHistory';
 import useStreamingTask from './hooks/useStreamingTask';
+import type { Task } from './types';
 import './App.css';
 
 export default function App() {
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const {
@@ -17,12 +18,12 @@ export default function App() {
     clear: clearCurrentTask,
   } = useStreamingTask();
 
-  const handleSubmit = useCallback((taskText) => {
+  const handleSubmit = useCallback((taskText: string) => {
     setSelectedTask(null); // Clear selected history item
     submit(taskText);
   }, [submit]);
 
-  const handleSelectTask = useCallback((task) => {
+  const handleSelectTask = useCallback((task: Task) => {
     clearCurrentTask(); // Clear streaming task when selecting from history
     setSelectedTask(task);
   }, [clearCurrentTask]);
@@ -30,13 +31,6 @@ export default function App() {
   // Determine which task to display
   // When streaming, show currentTask; otherwise show selectedTask or currentTask
   const displayTask = isStreaming ? currentTask : (selectedTask || currentTask);
-
-  // Trigger history refresh when streaming completes
-  const handleStreamComplete = useCallback(() => {
-    if (!isStreaming && currentTask?.id) {
-      setRefreshTrigger((prev) => prev + 1);
-    }
-  }, [isStreaming, currentTask?.id]);
 
   // Watch for streaming completion
   if (!isStreaming && currentTask?.id && selectedTask === null) {

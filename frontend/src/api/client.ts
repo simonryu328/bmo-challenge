@@ -1,9 +1,24 @@
+import type { Task, ExecutionStep, StreamCallbacks } from '../types';
+
 const API_BASE = '/api';
+
+interface SSEEvent {
+  event_type: 'step' | 'tool_used' | 'final_output' | 'complete' | 'error';
+  data: {
+    step_number?: number;
+    description?: string;
+    timestamp?: string;
+    tool?: string;
+    output?: string;
+    task_id?: string;
+    error?: string;
+  };
+}
 
 /**
  * Submit a task for processing (non-streaming)
  */
-export async function submitTask(task, threadId = 'default') {
+export async function submitTask(task: string, threadId: string = 'default'): Promise<Task> {
   const response = await fetch(`${API_BASE}/tasks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,17 +35,12 @@ export async function submitTask(task, threadId = 'default') {
 
 /**
  * Submit a task with SSE streaming
- * @param {string} task - The task description
- * @param {string} threadId - Thread ID for conversation context
- * @param {Object} callbacks - Event callbacks
- * @param {Function} callbacks.onStep - Called for each execution step
- * @param {Function} callbacks.onToolUsed - Called when a tool is used
- * @param {Function} callbacks.onOutput - Called with final output
- * @param {Function} callbacks.onComplete - Called when task is complete
- * @param {Function} callbacks.onError - Called on error
- * @returns {Function} Abort function to cancel the stream
  */
-export function submitTaskStream(task, threadId = 'default', callbacks = {}) {
+export function submitTaskStream(
+  task: string,
+  threadId: string = 'default',
+  callbacks: StreamCallbacks = {}
+): () => void {
   const controller = new AbortController();
 
   (async () => {
@@ -48,7 +58,7 @@ export function submitTaskStream(task, threadId = 'default', callbacks = {}) {
         return;
       }
 
-      const reader = response.body.getReader();
+      const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 
@@ -66,20 +76,20 @@ export function submitTaskStream(task, threadId = 'default', callbacks = {}) {
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             try {
-              const data = JSON.parse(line.slice(6));
+              const data: SSEEvent = JSON.parse(line.slice(6));
 
               switch (data.event_type) {
                 case 'step':
-                  callbacks.onStep?.(data.data);
+                  callbacks.onStep?.(data.data as ExecutionStep);
                   break;
                 case 'tool_used':
-                  callbacks.onToolUsed?.(data.data.tool);
+                  callbacks.onToolUsed?.(data.data.tool!);
                   break;
                 case 'final_output':
-                  callbacks.onOutput?.(data.data.output);
+                  callbacks.onOutput?.(data.data.output!);
                   break;
                 case 'complete':
-                  callbacks.onComplete?.(data.data.task_id);
+                  callbacks.onComplete?.(data.data.task_id!);
                   break;
                 case 'error':
                   callbacks.onError?.(new Error(data.data.error));
@@ -92,8 +102,8 @@ export function submitTaskStream(task, threadId = 'default', callbacks = {}) {
         }
       }
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        callbacks.onError?.(error);
+      if ((error as Error).name !== 'AbortError') {
+        callbacks.onError?.(error as Error);
       }
     }
   })();
@@ -104,7 +114,7 @@ export function submitTaskStream(task, threadId = 'default', callbacks = {}) {
 /**
  * Get task history with pagination
  */
-export async function getTasks(limit = 100, offset = 0) {
+export async function getTasks(limit: number = 100, offset: number = 0): Promise<Task[]> {
   const response = await fetch(
     `${API_BASE}/tasks?limit=${limit}&offset=${offset}`
   );
@@ -119,7 +129,7 @@ export async function getTasks(limit = 100, offset = 0) {
 /**
  * Get a specific task by ID
  */
-export async function getTask(taskId) {
+export async function getTask(taskId: string): Promise<Task | null> {
   const response = await fetch(`${API_BASE}/tasks/${taskId}`);
 
   if (!response.ok) {
@@ -135,7 +145,7 @@ export async function getTask(taskId) {
 /**
  * Get tasks by thread ID
  */
-export async function getTasksByThread(threadId) {
+export async function getTasksByThread(threadId: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE}/tasks/thread/${threadId}`);
 
   if (!response.ok) {
@@ -148,7 +158,7 @@ export async function getTasksByThread(threadId) {
 /**
  * Delete a task by ID
  */
-export async function deleteTask(taskId) {
+export async function deleteTask(taskId: string): Promise<{ message: string }> {
   const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
     method: 'DELETE',
   });

@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import './TaskInput.css';
 
-export default function TaskInput({ onSubmit, isLoading }) {
+interface TaskInputProps {
+  onSubmit: (task: string) => void;
+  isLoading: boolean;
+}
+
+export default function TaskInput({ onSubmit, isLoading }: TaskInputProps) {
   const [task, setTask] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (task.trim() && !isLoading) {
       onSubmit(task.trim());

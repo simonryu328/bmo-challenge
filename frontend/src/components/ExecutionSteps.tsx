@@ -1,7 +1,13 @@
 import { useState } from 'react';
+import type { ExecutionStep } from '../types';
 import './ExecutionSteps.css';
 
-export default function ExecutionSteps({ steps, isStreaming }) {
+interface ExecutionStepsProps {
+  steps: ExecutionStep[] | undefined;
+  isStreaming: boolean;
+}
+
+export default function ExecutionSteps({ steps, isStreaming }: ExecutionStepsProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   if (!steps || steps.length === 0) {
@@ -51,7 +57,7 @@ export default function ExecutionSteps({ steps, isStreaming }) {
   );
 }
 
-function formatTime(timestamp) {
+function formatTime(timestamp: string): string {
   try {
     const date = new Date(timestamp);
     return date.toLocaleTimeString();

@@ -1,18 +1,8 @@
 # BMO Chat
 
-A LangGraph-based agent with real-time streaming UI for task processing.
+A full-stack LangGraph-based agent with streaming.
 
 ![BMO Chat Demo](assets/bmo-demo.gif)
-
-## Features
-
-- **Three Tools**: Text processing, calculator, and weather lookup
-- **Multi-tool Chaining**: Agent can use multiple tools in sequence
-- **Real-time Streaming**: Watch execution steps as they happen
-- **Task History**: Browse and review past tasks
-- **SQLite Persistence**: Tasks are saved locally
-
-## Quick Start
 
 ### Prerequisites
 
@@ -23,40 +13,42 @@ A LangGraph-based agent with real-time streaming UI for task processing.
 ### Setup
 
 ```bash
-# Clone and install (installs frontend + backend automatically)
+# Clone the repo
 git clone <repo-url>
 cd bmo-chat
-npm install
+
+# Install frontend
+cd frontend && npm install
+
+# Install backend
+cd ../backend
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -e .
 
 # Add your OpenAI API key
-echo 'OPENAI_API_KEY=your-key-here' > backend/.env
+echo 'OPENAI_API_KEY=your-key-here' > .env
+```
 
-# Start the application
-npm start
+### Running
+
+```bash
+# Terminal 1: Start backend
+cd backend && source venv/bin/activate && python main.py
+
+# Terminal 2: Start frontend
+cd frontend && npm run dev
 ```
 
 The app will be available at:
-- **Frontend**: http://localhost:5173
+- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-
-## Usage
-
-Enter tasks in the input field. Examples:
-
-| Task | Tool Used |
-|------|-----------|
-| "Convert hello world to uppercase" | TextProcessorTool |
-| "Calculate 25 * 4 + 10" | CalculatorTool |
-| "What's the weather in San Francisco?" | WeatherMockTool |
-| "Weather in Tokyo, multiply temp by 2, then uppercase" | All three! |
+- **API Docs**: http://localhost:8000/docs  
 
 ## Project Structure
 
 ```
 bmo-chat/
-├── package.json          # Root package with npm scripts
-├── setup.sh              # One-time setup script
 ├── backend/
 │   ├── main.py           # FastAPI server
 │   ├── src/
@@ -67,9 +59,10 @@ bmo-chat/
 │   └── tests/
 └── frontend/
     ├── src/
-    │   ├── components/   # React components
+    │   ├── components/   # React components (TypeScript)
     │   ├── hooks/        # Custom hooks
-    │   └── api/          # API client
+    │   ├── api/          # API client
+    │   └── types/        # TypeScript type definitions
     └── index.html
 ```
 
@@ -86,14 +79,14 @@ bmo-chat/
 ## Scripts
 
 ```bash
-npm start          # Start both frontend and backend
-npm run build      # Build frontend for production
-npm test           # Run backend tests
+# Frontend (from frontend/)
+npm run dev        # Start dev server
+npm run build      # Build for production
+
+# Backend (from backend/, with venv activated)
+python main.py     # Start server
+pytest tests/ -v   # Run tests
 ```
 
-## Tech Stack
-
-- **Frontend**: React 18, Vite, Plain CSS
-- **Backend**: FastAPI, LangGraph, LangChain
-- **Database**: SQLite
-- **LLM**: OpenAI GPT-4o-mini
+## Thoughts
+The project took about 2 hrs to complete. With more time, I would migrate to PostgreSQL, implement authentication and multi-tenancy.

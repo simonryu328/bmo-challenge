@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 import { getTasks } from '../api/client';
+import type { Task } from '../types';
 import './TaskHistory.css';
 
-const TOOL_COLORS = {
+const TOOL_COLORS: Record<string, string> = {
   TextProcessorTool: '#8b5cf6',
   CalculatorTool: '#f59e0b',
   WeatherMockTool: '#06b6d4',
 };
 
-export default function TaskHistory({ onSelectTask, selectedTaskId, refreshTrigger }) {
-  const [tasks, setTasks] = useState([]);
+interface TaskHistoryProps {
+  onSelectTask: (task: Task) => void;
+  selectedTaskId: string | undefined;
+  refreshTrigger: number;
+}
+
+export default function TaskHistory({ onSelectTask, selectedTaskId, refreshTrigger }: TaskHistoryProps) {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadTasks();
@@ -96,16 +103,16 @@ export default function TaskHistory({ onSelectTask, selectedTaskId, refreshTrigg
   );
 }
 
-function truncate(str, maxLength) {
+function truncate(str: string, maxLength: number): string {
   if (str.length <= maxLength) return str;
   return str.slice(0, maxLength) + '...';
 }
 
-function formatRelativeTime(timestamp) {
+function formatRelativeTime(timestamp: string): string {
   try {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffMs = now - date;
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);

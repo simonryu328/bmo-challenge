@@ -1,16 +1,26 @@
 import { useState, useCallback, useRef } from 'react';
 import { submitTaskStream } from '../api/client';
+import type { Task, ExecutionStep } from '../types';
+
+interface UseStreamingTaskReturn {
+  submit: (taskText: string, threadId?: string) => void;
+  cancel: () => void;
+  clear: () => void;
+  isStreaming: boolean;
+  currentTask: Task | null;
+  error: string | null;
+}
 
 /**
  * Custom hook for managing streaming task submission
  */
-export default function useStreamingTask() {
+export default function useStreamingTask(): UseStreamingTaskReturn {
   const [isStreaming, setIsStreaming] = useState(false);
-  const [currentTask, setCurrentTask] = useState(null);
-  const [error, setError] = useState(null);
-  const abortRef = useRef(null);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<(() => void) | null>(null);
 
-  const submit = useCallback((taskText, threadId = 'default') => {
+  const submit = useCallback((taskText: string, threadId: string = 'default') => {
     // Reset state
     setIsStreaming(true);
     setError(null);
@@ -30,39 +40,39 @@ export default function useStreamingTask() {
 
     // Start streaming
     abortRef.current = submitTaskStream(taskText, threadId, {
-      onStep: (step) => {
-        setCurrentTask((prev) => ({
+      onStep: (step: ExecutionStep) => {
+        setCurrentTask((prev) => prev ? {
           ...prev,
           execution_steps: [...prev.execution_steps, step],
-        }));
+        } : null);
       },
 
-      onToolUsed: (tool) => {
-        setCurrentTask((prev) => ({
+      onToolUsed: (tool: string) => {
+        setCurrentTask((prev) => prev ? {
           ...prev,
           tools_used: prev.tools_used.includes(tool)
             ? prev.tools_used
             : [...prev.tools_used, tool],
-        }));
+        } : null);
       },
 
-      onOutput: (output) => {
-        setCurrentTask((prev) => ({
+      onOutput: (output: string) => {
+        setCurrentTask((prev) => prev ? {
           ...prev,
           output_text: output,
-        }));
+        } : null);
       },
 
-      onComplete: (taskId) => {
-        setCurrentTask((prev) => ({
+      onComplete: (taskId: string) => {
+        setCurrentTask((prev) => prev ? {
           ...prev,
           id: taskId,
-        }));
+        } : null);
         setIsStreaming(false);
         abortRef.current = null;
       },
 
-      onError: (err) => {
+      onError: (err: Error) => {
         setError(err.message);
         setIsStreaming(false);
         abortRef.current = null;
