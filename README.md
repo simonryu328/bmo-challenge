@@ -1,6 +1,6 @@
 # BMO Chat
 
-A full-stack LangGraph-based agent with streaming.
+A full-stack LangGraph-based agent with streaming
 
 ![BMO Chat Demo](assets/bmo-demo.gif)
 
